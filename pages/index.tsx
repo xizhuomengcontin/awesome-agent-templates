@@ -1,12 +1,14 @@
 import { useState, useMemo, useEffect } from 'react'
 import { GetStaticProps } from 'next'
 import Head from 'next/head'
-import { Search, Filter, Moon, Sun, Github, ExternalLink } from 'lucide-react'
+import { Search, Filter, Moon, Sun, Github, ExternalLink, Plus } from 'lucide-react'
 import { getAllAgents, AgentWithSlug } from '@/lib/agents'
 import { SearchFilters } from '@/types/agent'
+import { buildToolCatalog, slugifyName } from '@/lib/submit-agent'
 import AgentCard from '@/components/AgentCard'
 import AgentModal from '@/components/AgentModal'
 import CodeGeneratorModal from '@/components/CodeGeneratorModal'
+import SubmitAgentModal from '@/components/SubmitAgentModal'
 import TagManager from '@/components/TagManager'
 import ContributeCard from '@/components/ContributeCard'
 import { cn, getProviderIconUrl, getFrameworkUrl, getCategoryColor } from '@/lib/utils'
@@ -23,6 +25,7 @@ interface HomeProps {
 export default function Home({ agents, allCategories, allTags, allFrameworks, allReasoningLevels }: HomeProps) {
   const [selectedAgent, setSelectedAgent] = useState<{ agent: AgentWithSlug; slug: string } | null>(null)
   const [codeGeneratorAgent, setCodeGeneratorAgent] = useState<AgentWithSlug | null>(null)
+  const [submitOpen, setSubmitOpen] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
   const [filters, setFilters] = useState<SearchFilters>({
@@ -54,6 +57,10 @@ export default function Home({ agents, allCategories, allTags, allFrameworks, al
     if (!themeReady) return
     localStorage.setItem('theme', darkMode ? 'dark' : 'light')
   }, [darkMode, themeReady])
+
+  // Built from the templates already on the page rather than shipped as a
+  // separate prop, which would duplicate every tool entry in the page payload.
+  const toolCatalog = useMemo(() => buildToolCatalog(agents), [agents])
 
   const filteredAgents = useMemo(() => {
     return agents.filter(agent => {
@@ -152,6 +159,15 @@ export default function Home({ agents, allCategories, allTags, allFrameworks, al
               </div>
               
               <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setSubmitOpen(true)}
+                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                  title="Add your agent to the library"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline">Add Your Agent</span>
+                </button>
+
                 <a
                   href="https://github.com/samitugal/awesome-agent-templates"
                   target="_blank"
@@ -377,7 +393,7 @@ export default function Home({ agents, allCategories, allTags, allFrameworks, al
           {/* Agent Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {/* Leads the grid — at the end it sat below 19 cards and went unseen */}
-            <ContributeCard templateCount={agents.length} />
+            <ContributeCard templateCount={agents.length} onContribute={() => setSubmitOpen(true)} />
 
             {filteredAgents.length > 0 ? (
               filteredAgents.map((agent) => (
@@ -436,6 +452,18 @@ export default function Home({ agents, allCategories, allTags, allFrameworks, al
           agent={codeGeneratorAgent}
           isOpen={!!codeGeneratorAgent}
           onClose={() => setCodeGeneratorAgent(null)}
+        />
+
+        {/* Submit Agent Modal */}
+        <SubmitAgentModal
+          isOpen={submitOpen}
+          onClose={() => setSubmitOpen(false)}
+          categories={allCategories}
+          frameworks={allFrameworks}
+          tags={allTags}
+          agentNames={agents.map(agent => agent.identity.name)}
+          existingSlugs={agents.map(agent => slugifyName(agent.identity.name))}
+          catalog={toolCatalog}
         />
       </div>
     </div>

@@ -2,10 +2,21 @@ import { Plus, Github, ExternalLink } from 'lucide-react'
 
 interface ContributeCardProps {
   templateCount?: number
+  onContribute?: () => void
 }
 
-export default function ContributeCard({ templateCount = 5 }: ContributeCardProps) {
+export default function ContributeCard({ templateCount = 5, onContribute }: ContributeCardProps) {
+  // The card opens the submission form; the small button stays a plain link out
+  // to the repo for anyone who would rather write the YAML by hand.
   const handleContribute = () => {
+    if (onContribute) {
+      onContribute()
+      return
+    }
+    window.open('https://github.com/samitugal/awesome-agent-templates', '_blank')
+  }
+
+  const handleOpenRepo = () => {
     window.open('https://github.com/samitugal/awesome-agent-templates', '_blank')
   }
 
@@ -39,7 +50,7 @@ export default function ContributeCard({ templateCount = 5 }: ContributeCardProp
       {/* Description */}
       <div className="mb-4 flex-1">
         <p className="text-sm text-muted-foreground line-clamp-2">
-          Share your creative agents with the community! Submit a pull request to add your agent templates.
+          Share your agent with the community — fill in a short form and we open the pull request for you.
         </p>
       </div>
 
@@ -64,10 +75,10 @@ export default function ContributeCard({ templateCount = 5 }: ContributeCardProp
         <button
           onClick={(e) => {
             e.stopPropagation();
-            handleContribute();
+            handleOpenRepo();
           }}
           className="px-2 py-1 text-xs bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors flex items-center gap-1 flex-shrink-0"
-          title="Contribute on GitHub"
+          title="View the repository on GitHub"
         >
           <Github className="w-3 h-3" />
         </button>
