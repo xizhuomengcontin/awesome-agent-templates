@@ -61,6 +61,7 @@ export interface AgentMetadata {
   related_agents?: string[]
   compatible_frameworks?: string[]
   author?: string
+  /** @deprecated Templates put hints at the top level; kept so older files still resolve. */
   hints?: string[]
 }
 
@@ -69,6 +70,7 @@ export interface AgentTemplate {
   prompt: AgentPrompt
   tools: AgentTools
   settings: AgentSettings
+  hints?: string[]
   metadata: AgentMetadata
 }
 

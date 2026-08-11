@@ -44,6 +44,10 @@ export default function AgentModal({ agent, slug, isOpen, onClose, onGenerateCod
 
   if (!isOpen || !agent) return null
 
+  // Templates write hints at the top level (and CONTRIBUTING.md documents them
+  // there); metadata.hints is only a fallback for older files.
+  const hints = agent.hints || agent.metadata.hints || []
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="relative w-full max-w-4xl max-h-[90vh] bg-card border border-border rounded-lg shadow-xl overflow-hidden">
@@ -374,7 +378,7 @@ export default function AgentModal({ agent, slug, isOpen, onClose, onGenerateCod
               )}
 
               {/* Author Hints */}
-              {agent.metadata.hints && agent.metadata.hints.length > 0 && (
+              {hints.length > 0 && (
                 <div>
                   <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                     <Lightbulb className="w-5 h-5" />
@@ -382,7 +386,7 @@ export default function AgentModal({ agent, slug, isOpen, onClose, onGenerateCod
                   </h3>
                   <div className="bg-muted/50 rounded-md p-4">
                     <ul className="space-y-2">
-                      {agent.metadata.hints.map((hint, index) => (
+                      {hints.map((hint, index) => (
                         <li key={index} className="flex items-start gap-2 text-sm">
                           <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></span>
                           <span className="text-foreground">{hint}</span>
