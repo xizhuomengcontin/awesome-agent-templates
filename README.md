@@ -71,6 +71,7 @@ Browse templates visually with:
 **We’re a community project, your ideas shape this ecosystem.**
 
 ### Add a New Agent
+- [Continuum-AI-Corp/OrcaReplay](https://github.com/Continuum-AI-Corp/OrcaReplay) — drop-in recorder that sits between your agent and the model provider.
 
 Templates are organized by category in folders:
 ```
